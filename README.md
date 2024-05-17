@@ -24,4 +24,4 @@ in extension.
 ```{r mdb, eval=FALSE}
 make_blast_db(infile = "PATH/TO/FILE.FASTA",outfile="my_out_file")
 ```
-
+...
