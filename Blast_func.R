@@ -1,27 +1,101 @@
 #a function to run the different blast serches from within R
-blstinr <- function(btype = "blastn", dbase,qry,numt=1,...){
+# Parameters:
+# btype: a string of the blast search, default is blastn
+# dbase: a string of blast data base file name/path
+# qry: a file of the query sequence
+# Returns:
+# a data frame of the blast search 
+install.packages("tidyr")
+install.packages("rlang")
+install.packages("remotes")
+remove.packages('cli')
+install.packages('cli')
+library(remotes)
+remotes::install_github("r-lib/rlang")
+library(tidyr)
+install.packages('rlang')
+library(dplyr)
+update.packages(ask = FALSE)
+
+blstinr <- function(btype = "blastn", dbase,qry, taxid = FALSE,numt=1,...){
   
-  colnames <- c("qseqid","sseqid","pident","length","mismatch","gapopen","qstart",
+  # Define the column names for the BLAST output
+  colnames_a <- c("qseqid","sseqid","pident","length","mismatch","gapopen","qstart",
                 "qend","sstart","send","evalue","bitscore")
+  colnames_b <-c(colnames_a,"staxids")
   
+  # Check the path to the BLAST executable
   bt <- Sys.which(paste(btype))
   
+  # if BLAST executable path was not found, throw an error
   if(nchar(bt) == 0){
     stop(paste("Can't find",btype,
                "on the computer, make sure balast suite is properly installed",
-               sep = " "))} else{if(nchar(bt)>0){
-                 
+               sep = " "))} 
+  # If BLAST executable path found, execute the BLAST command
+  else{if(nchar(bt)>0){
+                  if(taxid==FALSE){
+                 # Run BLAST search using system2 command
                  bl_out <-system2(command = paste(bt), 
                                   args = c("-db", paste(dbase),
                                            "-query", paste(qry),
                                            "-outfmt", "6",
                                            "-num_threads", paste(numt)), 
                                   wait = TRUE, stdout = TRUE) %>% 
-                   as_tibble() %>% 
-                   separate(col = 1, into = colnames,sep = "\t",
+                   as_tibble() %>%  # form a tibble data frame from the tabular output
+                   separate(col = 1, into = colnames_a,sep = "\t", # Separate a single column into multiple columns 
                             convert = TRUE) %>% 
-                   mutate(Range = send - sstart)}
-                
-               }  
+                   mutate(Range = send - sstart)} # add a new column, Range, which represents the length of the alignment  
+  else
+  {
+    bl_out <-system2(command = paste(bt), 
+                     args = c("-db", paste(dbase),
+                              "-query", paste(qry),
+                              "-outfmt", shQuote("6 qseqid sseqid pident length mismatch gapopen qstart qend sstart send evalue bitscore staxids"),
+                              "-num_threads", paste(numt)), 
+                     wait = TRUE, stdout = TRUE) %>% 
+      as_tibble() %>%  # form a tibble data frame from the tabular output
+      separate(col = 1, into = colnames_b,sep = "\t", # Separate a single column into multiple columns 
+               convert = TRUE) %>% 
+      mutate(Range = send - sstart)}} # add a new column, Range, which represents the length of the alignment    
+    }
+    
+  #bl_out save as csv table.
+  table_outputs_path <- paste0("outputs/table/",timeStamp_global,"_table.csv")
+  results_list <- list(data_table = table_outputs_path, plot_table = NULL)
+  reporter_function("hello", results_list, entry_time);
+  write.table(bl_out, file = table_outputs_path, sep = ",", row.names = FALSE, quote = TRUE)
+  # Return BLAST output
   return(bl_out)
 }
+
+
+blast_func <- blstinr('blastx','spike_protein_seqs_SARS','genomes_seqs_SARS.fasta', TRUE)
+
+
+
+
+seqid_1 <- blstinr(dbase = "C:\\Users\\sarah\\OneDrive\\Documents\\DNA", 
+                   qry = "C:\\Users\\sarah\\OneDrive\\Documents\\ArchQuery.fa", taxid = TRUE)
+
+seqid_1
+
+seqid_2 <- blstinr(dbase = "C:\\Users\\sarah\\OneDrive\\Documents\\DNA", 
+                   qry = "C:\\Users\\sarah\\OneDrive\\Documents\\ArchQuery.fa")
+
+seqid_2
+
+prot_No_ids <- blstinr(btype = "blastx", dbase = "C:\\Users\\sarah\\OneDrive\\Documents\\prot", 
+                       qry = "C:\\Users\\sarah\\OneDrive\\Documents\\blastinR\\genomes_seqs_SARS.fasta")
+
+prot_No_ids
+
+prot_ids <- blstinr(btype = "blastx", dbase = "C:\\Users\\sarah\\OneDrive\\Documents\\prot", 
+                    qry = "C:\\Users\\sarah\\OneDrive\\Documents\\blastinR\\genomes_seqs_SARS.fasta",taxid = TRUE)
+prot_ids
+
+
+seq <- "AAAATTTTGGGGCCCCGCGCGCGTAAATATATATGCGCGAATTGCG"
+cut_seq <- substr(seq, 5, 20)
+cut_seq
+
