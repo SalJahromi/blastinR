@@ -17,7 +17,9 @@ entry_time <- timestamp(stamp = sys_time, prefix = "--- ", suffix = " ---", quie
 blast_func <- blstinr('blastx','spike_protein_seqs_SARS','genomes_seqs_SARS.fasta', TRUE)
 plot1 <- summerize_bl(df1, blast_func, "ID", c("WatchMovie", "Time","Price"))
 
-
+label_generator <- function(){
+  return(paste0(UUIDgenerate()))
+}
 
 reporter_function <- function(function_call, data_list, entry_time){
   
