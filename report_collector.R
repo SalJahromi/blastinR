@@ -8,9 +8,10 @@ library(knitr)
 library(rmarkdown)
 
 
-timeStamp_global <- format(Sys.time(), "%Y%m%d%H%M%S")
-entry_time <- timestamp(stamp = date(), prefix = "--- ", suffix = " ---", quiet = FALSE)
-function_call_sig <- c('function_call')
+sys_time <- Sys.time() #save the time
+timeStamp_global <- format(sys_time, "%Y%m%d%H%M%S") # time stamp for naming output files
+entry_time <- timestamp(stamp = sys_time, prefix = "--- ", suffix = " ---", quiet = FALSE) # time stamp for the report
+
 
 
 blast_func <- blstinr('blastx','spike_protein_seqs_SARS','genomes_seqs_SARS.fasta', TRUE)
