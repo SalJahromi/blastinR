@@ -5,6 +5,7 @@
 # qry: a file of the query sequence
 # Returns:
 # a data frame of the blast search 
+<<<<<<< HEAD
 install.packages("tidyr")
 install.packages("rlang")
 install.packages("remotes")
@@ -19,6 +20,10 @@ update.packages(ask = FALSE)
 
 blstinr <- function(btype = "blastn", dbase,qry, taxid = FALSE,numt=1,...){
   function_call_sig <- match.call()
+=======
+blstinr <- function(btype = "blastn", dbase,qry, taxid = FALSE,numt=1,...){
+  
+>>>>>>> 0aa4be7967ebf825536d2377e743dde8cbcc8c93
   # Define the column names for the BLAST output
   colnames_a <- c("qseqid","sseqid","pident","length","mismatch","gapopen","qstart",
                 "qend","sstart","send","evalue","bitscore")
@@ -60,6 +65,7 @@ blstinr <- function(btype = "blastn", dbase,qry, taxid = FALSE,numt=1,...){
       mutate(Range = send - sstart)}} # add a new column, Range, which represents the length of the alignment    
     }
     
+<<<<<<< HEAD
   #bl_out save as csv table.
   table_outputs_path <- paste0("outputs/table/",timeStamp_global,"_table.csv")
   results_list <- list(data_table = table_outputs_path, plot_table = NULL, message = NULL, output_files = NULL)
@@ -67,10 +73,14 @@ blstinr <- function(btype = "blastn", dbase,qry, taxid = FALSE,numt=1,...){
   function_call <- match.call()
   reporter_function(function_call, results_list, entry_time);
   write.table(bl_out, file = table_outputs_path, sep = ",", row.names = FALSE, quote = TRUE)
+=======
+  
+>>>>>>> 0aa4be7967ebf825536d2377e743dde8cbcc8c93
   # Return BLAST output
   return(bl_out)
 }
 
+<<<<<<< HEAD
 
 blast_func <- blstinr('blastx','spike_protein_seqs_SARS','genomes_seqs_SARS.fasta', TRUE)
 
@@ -101,3 +111,5 @@ seq <- "AAAATTTTGGGGCCCCGCGCGCGTAAATATATATGCGCGAATTGCG"
 cut_seq <- substr(seq, 5, 20)
 cut_seq
 
+=======
+>>>>>>> 0aa4be7967ebf825536d2377e743dde8cbcc8c93
