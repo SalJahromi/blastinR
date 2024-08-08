@@ -1,4 +1,0 @@
-
-savehistory()
-loadhistory()
-savehistory()
