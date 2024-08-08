@@ -18,7 +18,7 @@ library(dplyr)
 update.packages(ask = FALSE)
 
 blstinr <- function(btype = "blastn", dbase,qry, taxid = FALSE,numt=1,...){
-  
+  function_call_sig <- match.call()
   # Define the column names for the BLAST output
   colnames_a <- c("qseqid","sseqid","pident","length","mismatch","gapopen","qstart",
                 "qend","sstart","send","evalue","bitscore")
@@ -62,8 +62,10 @@ blstinr <- function(btype = "blastn", dbase,qry, taxid = FALSE,numt=1,...){
     
   #bl_out save as csv table.
   table_outputs_path <- paste0("outputs/table/",timeStamp_global,"_table.csv")
-  results_list <- list(data_table = table_outputs_path, plot_table = NULL)
-  reporter_function("hello", results_list, entry_time);
+  results_list <- list(data_table = table_outputs_path, plot_table = NULL, message = NULL, output_files = NULL)
+  
+  function_call <- match.call()
+  reporter_function(function_call, results_list, entry_time);
   write.table(bl_out, file = table_outputs_path, sep = ",", row.names = FALSE, quote = TRUE)
   # Return BLAST output
   return(bl_out)

@@ -1,0 +1,25 @@
+{
+  "version": "1.2",
+  "dbname": "spike_protein_seqs_SARS",
+  "dbtype": "Protein",
+  "db-version": 5,
+  "description": "spike_protein_seqs_SARS.fasta",
+  "number-of-letters": 11649,
+  "number-of-sequences": 9,
+  "last-updated": "2024-08-07T21:02:00",
+  "number-of-volumes": 1,
+  "number-of-taxids": 9,
+  "bytes-total": 1012855,
+  "bytes-to-cache": 11855,
+  "files": [
+    "spike_protein_seqs_SARS.pdb",
+    "spike_protein_seqs_SARS.phr",
+    "spike_protein_seqs_SARS.pin",
+    "spike_protein_seqs_SARS.pog",
+    "spike_protein_seqs_SARS.pos",
+    "spike_protein_seqs_SARS.pot",
+    "spike_protein_seqs_SARS.psq",
+    "spike_protein_seqs_SARS.ptf",
+    "spike_protein_seqs_SARS.pto"
+  ]
+}

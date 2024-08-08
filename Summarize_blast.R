@@ -83,7 +83,8 @@ summerize_bl <- function(df1, df2, id_col, summarize_cols) {
  html_outputs_path <- paste0("outputs/png/",timeStamp_global,"_plot.html")
  png_outputs_path <- paste0("outputs/png/",timeStamp_global,"_plot.png")
  results_list <- list(data_table = NULL, plot_table = html_outputs_path)
- reporter_function("hello", results_list, entry_time);
+ function_call <- match.call()
+ reporter_function(function_call, results_list, entry_time);
  saveWidget(plot, file = html_outputs_path)
  webshot(html_outputs_path, file = png_outputs_path)
  
