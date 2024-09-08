@@ -22,6 +22,17 @@ label_generator <- function(){
   return(paste0(UUIDgenerate()))
 }
 
+list_to_string <- function(messageList){
+  str <- ""
+  for(i in messageList){
+    str <- paste0(str,i)
+    str <- paste0(str,"\n")
+    str <- paste0(str,"<br>")
+    str <- paste0(str,"\n")
+    
+  }
+  return(str)
+}
 
 # Fixes the format of the function call object for the report
 fix_functionCall <- function(function_call){
@@ -41,6 +52,8 @@ fix_functionCall <- function(function_call){
 #           contents of the list can be paths to csv or html files, or message and files outputted by function.
 #           If the function doesn't have those items, then they will have the NULL value in the list
 # entry time: The time the function was run by the user
+
+
 reporter_function <- function(function_call, data_list, entry_time){
   
   function_call <- fix_functionCall(function_call)
@@ -62,11 +75,16 @@ reporter_function <- function(function_call, data_list, entry_time){
   rmd_content_new <- c()
   
   # For printing the make_blast_db message
-  
+  data_list$message <- gsub("\\\\", "/", data_list$message)
   if(!is.null(data_list$message)){
     make_db_content <- c(
       paste0("#### Function Name: make_blast_db"),
-      paste0(data_list$message)
+      paste0("```{r ", label_generator(),",eval = FALSE}\n",
+             function_call,"\n",
+             "```"),
+      paste0(data_list$message),
+      paste0('\n'),
+      print("<br>")
     )
     rmd_content_new <- c(make_db_content)
   }
@@ -93,7 +111,7 @@ reporter_function <- function(function_call, data_list, entry_time){
   # if plot_table is not null, then it contains a plot
   if(!is.null(data_list$plot_table)){
     plot_content<- c(
-      paste0("#### Function Name: blstinr"),
+      paste0("#### Function Name: Summarize_bl"),
       paste0("```{r ", label_generator(),",eval = FALSE}\n",
              function_call,"\n",
              "```"),
@@ -105,10 +123,18 @@ reporter_function <- function(function_call, data_list, entry_time){
     rmd_content_new <- c(plot_content)
   }
   
+  
+  
+  #outputs list of files
   if(!is.null(data_list$output_files)){
+    file_list <- list_to_string(data_list$output_files)
     output_content <- c(
       paste0("#### Function Name: retrieve_hit_seqs"),
-      paste0(data_list$output_files)
+      paste0("```{r ", label_generator(),",eval = FALSE}\n",
+             function_call,"\n",
+             "```"),
+      paste0(file_list),
+      print("<br>")
     )
     
     rmd_content_new <- c(output_content)
