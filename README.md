@@ -5,9 +5,9 @@ as dependencies
 
 
 
-[Link to Functions](#Functions)
+* [Functions](#Functions)
 
-[Link to manual](#Manual)
+* [Manual](#Manual)
 
 
 ```{r libs, eval=FALSE}
