@@ -3,10 +3,28 @@ A collection of functions aimed at interfacing R and blast+ suite.
 The tidyverse package should be loaded first as the functions use some tidyverse packages 
 as dependencies 
 
+
+
+[Link to Functions](#Functions)
+
+
+
 ```{r libs, eval=FALSE}
 library("tidyverse")
 ```
 
+```r
+# essential for the summarize_bl function
+library(networkD3)
+library(htmlwidgets)
+library(webshot)
+
+```
+
+
+# Functions
+
+There are a series of functions involved in the blastinR workflow.
 
 ## **The make_blast_db function**
 
@@ -20,14 +38,12 @@ in extension.
 ```{r mdb, eval=FALSE}
 make_blast_db(infile = "PATH/TO/FILE.FASTA",outfile="my_out_file")
 ```
-...
-=======
 
 
 ## **The blstinr function**
 
-The `btype` argument specifies which blast type would be used, the default is `blastn`.
-The `numt` arguments specifies the number of threads to be used, only work with UNIX based OS, default value is 1. 
+* `btype` argument specifies which blast type would be used, the default is `blastn`.
+* `numt` arguments specifies the number of threads to be used, only work with UNIX based OS, default value is 1. 
 
 
 ```{r mdb, eval=FALSE}
@@ -37,7 +53,23 @@ qry = "PATH/TO/FASTA/FILE")
 
 
 ## **The retrive_hit_seqs function**
+
 A function to retrieve the hit sequence from blast search results from within R.
+
+* `query_ids` is a vector which holds the ID of queries to be retrieved. 
+* `blast_results` parameter is the data frame output of the blastinr function. 
+* `NumHitseqs` is the number of ...
+* `outfile` indicates the name and path of the output file.
+* `cut_seq` default paraemeter ...
+* `MultFiles`
+* `report` default parameter creates a report or adds to an existing report. 
+
+
+```{r mdb, eval=FALSE}
+retrieve_hit_seqs(query_ids, blast_results, blastdb = "PATH/TO/FASTA/FILE", 
+NumHitseqs = 1, outfile= "PATH", cut_seq = TRUE,
+MultFiles = FALSE, report = TRUE)
+```
 
 ## **Plotting taxonomy or annotations**
 
@@ -100,9 +132,10 @@ Note that the query sequences are nucleotides. This is important as it determine
 Since the database is a protein database and the query is nucleotide sequences, we will use blastx.
 
 ```r
-blstinr('blastx','spike_protein_seqs_SARS','genomes_seqs_SARS.fasta', TRUE)
+blast_output <- blstinr('blastx','spike_protein_seqs_SARS','genomes_seqs_SARS.fasta', TRUE)
 
 ```
+The output data frame:
 ```
 # A tibble: 123 × 14
    qseqid      sseqid pident length mismatch gapopen qstart  qend sstart  send    evalue bitscore staxids
@@ -121,3 +154,23 @@ blstinr('blastx','spike_protein_seqs_SARS','genomes_seqs_SARS.fasta', TRUE)
 # ℹ 1 more variable: Range <int>
 # ℹ Use `print(n = ...)` to see more rows
 ```
+
+### Retrieve Hit Sequences From BLAST 
+
+```r
+# Retrieve ID vector
+qry_ids <- c("Bat_coronavirus")
+
+retrieve_hit_seqs(qry_ids, blast_func, "spike_protein_seqs_SARS", 6, "prot_hit_OneFile", TRUE, FALSE, FALSE)
+```
+The first sequence inside the "prot_hit_OneFile" output fasta file. 
+```
+>Bat_coronavirus__queryID:Bat_coronavirus_sstart:12_send:1269
+SSQCVNLTTRTQLPPAYTNSSTRGVYYPDKVFRSSVLHLTQDLFLPFFSNVTWFHAIHVSGTNGIKRFDNPVLPFNDGVYFASTEKSNIIRGWIFGTTLDSKTQSLLIVNNATNVVIKVCEFQFCNDPFLGVYYHKNNKSWMESEFRVYSSANNCTFEYVSQPFLMDLEGKQGNFKNLREFVFKNIDGYFKIYSKHTPINLVRDLPPGFSALEPLVDLPIGINITRFQTLLALHRSYLTPGDSSSGWTAGAAAYYVGYLQPRTFLLKYNENGTITDAVDCALDPLSETKCTLKSFTVEKGIYQTSNFRVQPTDSIVRFPNITNLCPFGEVFNATTFASVYAWNRKRISNCVADYSVLYNSTSFSTFKCYGVSPTKLNDLCFTNVYADSFVITGDEVRQIAPGQTGKIADYNYKLPDDFTGCVIAWNSKHIDAKEGGNFNYLYRLFRKANLKPFERDISTEIYQAGSKPCNGQTGLNCYYPLYRYGFYPTDGVGHQPYRVVVLSFELLNAPATVCGPKKSTNLVKNKCVNFNFNGLTGTGVLTESNKKFLPFQQFGRDIADTTDAVRDPQTLEILDITPCSFGGVSVITPGTNASNQVAVLYQDVNCTEVPVAIHADQLTPTWRVYSTGSNVFQTRAGCLIGAEHVNNSYECDIPIGAGICASYQTQTNSRSVASQSIIAYTMSLGAENSVAYSNNSIAIPTNFTISVTTEILPVSMTKTSVDCTMYICGDSTECSNLLLQYGSFCTQLNRALTGIAVEQDKNTQEVFAQVKQIYKTPPIKDFGGFNFSQILPDPSKPSKRSFIEDLLFNKVTLADAGFIKQYGDCLGDIAARDLICAQKFNGLTVLPPLLTDEMIAQYTSALLAGTITSGWTFGAGAALQIPFAMQMAYRFNGIGVTQNVLYENQKLIANQFNSAIGKIQDSLSSTASALGKLQDVVNQNAQALNTLVKQLSSNFGAISSVLNDILSRLDKVEAEVQIDRLITGRLQSLQTYVTQQLIRAAEIRASANLAATKMSECVLGQSKRVDFCGKGYHLMSFPQSAPHGVVFLHVTYVPAQEKNFTTAPAICHDGKAHFPREGVFVSNGTHWFVTQRNFYEPQIITTDNTFVSGSCDVVIGIVNNTVYDPLQPELDSFKEELDKYFKNHTSPDVDLGDISGINASVVNIQKEIDRLNEVAKNLNESLIDLQELGKYEQYIKWPWYIWLGFIAGLIAIIMVTIMLCCMTSCCSCLKGCCSCGSCCKFDEDDSEPVLKGVKLHYT  
+
+```
+
+### Summarize 
+
+
+
