@@ -13,6 +13,8 @@ label_generator <- function(){
   return(paste0(UUIDgenerate()))
 }
 
+
+# For conversion of the message list into a string, which will be neatly presented in the final report
 list_to_string <- function(messageList){
   str <- ""
   for(i in messageList){
@@ -25,28 +27,44 @@ list_to_string <- function(messageList){
   return(str)
 }
 
-# Fixes the format of the function call object for the report
-fix_functionCall <- function(function_call){
-  function_call <- deparse(function_call)
-  function_call <- paste(function_call, collapes = " ")
-  function_call <- toString(function_call)
-  function_call <- gsub("\\\\",",",function_call)
-  function_call <- gsub("\\s*,\\s*",",", function_call)
-  function_call <- gsub("\\s+"," ", function_call)
+
+# Fixes issues with the function_call, making it clear and presentable in the final report as a code chunk
+fix_functionCall <- function(function_call) {
+  function_call <- deparse(function_call)  # Convert to character string representation
+  function_call <- paste(function_call, collapse = " ")  # correcting collapses
+  function_call <- gsub("\\s*,\\s*", ",", function_call)  # Remove extra spaces around commas
+  function_call <- gsub("\\s+", " ", function_call)  # Normalize spaces
+  function_call <- trimws(function_call)  # Remove leading/trailing spaces
   return(function_call)
 }
 
-# Creates a report in rmd.
-#Parameters:
-# function_call: the function call or the line of code that ran a function by the user
-# data_list: A list that contains data from the function ran by the user
-#           contents of the list can be paths to csv or html files, or message and files outputted by function.
-#           If the function doesn't have those items, then they will have the NULL value in the list
-# entry time: The time the function was run by the user
 
+
+# For knitting the rmd into an html document
+generate_report <- function(){
+  # knit rmd file into html document
+  render("blast_history_report.Rmd", output_format = "html_document")
+}
+
+
+# For deleting the html and rmd documents
+delete_report <- function(){
+  # delete the rmd file and the html file it generates
+  file.remove("blast_history_report.Rmd", "blast_history_report.html")
+}
+
+
+# Creates an rmd file which acts as a scientific report, detailing the user's interaction with the program's functions. 
+# NOTE* This function is NOT called by the pipeline.
+# Parameters:
+# function_call:  an inputted function call with its parameters
+# data_list:  a list holding the data outputted from the function which calls this reporter function. Will usually hold file paths
+# entry_time: The execution time of the function which called the reporter function.
+# Returns:
+# RMD file: "blast_history_report.rmd"
 
 reporter_function <- function(function_call, data_list, entry_time){
-  
+  print(function_call)
   function_call <- fix_functionCall(function_call)
   rmd_file <- "blast_history_report.rmd" # name of rmd file
   if(!file.exists(rmd_file)){
@@ -65,6 +83,8 @@ reporter_function <- function(function_call, data_list, entry_time){
   rmd_content_time <- c(paste0("### ", entry_time))
   rmd_content_new <- c()
   
+  
+  
   # For printing the make_blast_db message
   data_list$message <- gsub("\\\\", "/", data_list$message)
   if(!is.null(data_list$message)){
@@ -74,7 +94,7 @@ reporter_function <- function(function_call, data_list, entry_time){
              function_call,"\n",
              "```"),
       paste0(data_list$message),
-      paste0('\n'),
+      paste0('\n')
     )
     rmd_content_new <- c(make_db_content)
   }
@@ -95,22 +115,29 @@ reporter_function <- function(function_call, data_list, entry_time){
       paste0("\n"),
       ""
     )
+    
     rmd_content_new <- c(table_content);
   }
   
   # if plot_table is not null, then it contains a plot
   if(!is.null(data_list$plot_table)){
-    plot_content<- c(
-      paste0("#### Function Name: Summarize_bl"),
-      paste0("```{r ", label_generator(),",eval = FALSE}\n",
-             function_call,"\n",
-             "```"),
-      paste0("```{r ",label_generator(),", echo=FALSE , out.width = '80%', warning = FALSE}","\n",
-                            paste0("knitr::include_url('",data_list$plot_table,"')"),"\n",
-                            "```"),
-                     ""
-    )
-    rmd_content_new <- c(plot_content)
+    
+    if(data_list$pipeline != TRUE){
+      plot_content<- c(
+        paste0("#### Function Name: Summarize_bl"),
+        paste0("```{r ", label_generator(),",eval = FALSE}\n",
+               function_call,"\n",
+               "```"),
+        paste0("```{r ",label_generator(),", echo=FALSE , out.width = '80%', warning = FALSE}","\n",
+               paste0("knitr::include_url('",data_list$plot_table,"')"),"\n",
+               "```"),
+        ""
+      )
+      rmd_content_new <- c(plot_content)
+      
+    }
+
+
   }
   
   
@@ -125,7 +152,7 @@ reporter_function <- function(function_call, data_list, entry_time){
              "```"),
       paste0(file_list),
       paste0('\n')
-      )
+    )
     
     rmd_content_new <- c(output_content)
   }
@@ -149,7 +176,14 @@ reporter_function <- function(function_call, data_list, entry_time){
     writeLines(update_content, rmd_file)
     
   } 
-
+  
 }
+
+
+
+
+
+
+
 
 
