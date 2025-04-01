@@ -29,7 +29,7 @@ There are a series of functions involved in the blastinR workflow.
 
 ## **make_blast_db**
 
-The `make_blast_d1b` function is a wrapper for the `makeblastdb` function from BLAST+.
+The `make_blast_db` function is a wrapper for the `makeblastdb` function from BLAST+.
 It will generate all the files required for a BLAST database. 
 The `infile` argument should specify the path to a fasta file containing all the sequences 
 to be included in the database. The `outfile` argument should specify the names of all the
@@ -49,14 +49,14 @@ make_blast_db(infile = "PATH/TO/FILE.FASTA",outfile="my_out_file")
 Runs BLAST+ on query against a local database specified by the user. 
 
 * `btype` argument specifies which blast type would be used, the default is `blastn`.
-* `dbase` Path or name of the blast database. Must be fasta format.
+* `dbase` Path or name of the blast database without including any extensions.
 * `qry` Path or name of the query file. Must be fasta format.
 * `taxid` Default is FALSE. False means there is no file for taxonomy id. True means that there is a file for taxonomy id that was used in make_blast_db function.
 * `report` Default is TRUE. Creates report.
 * `ncores` Default is two. Number of threads.
 * `numt` arguments specifies the number of threads to be used, only work with UNIX based OS, default value is 1. 
 
-Returns a dataframe with blast/query results. Will output this information is the form of an interactive table. 
+Returns a dataframe with blast/query results. Will output this information in the form of an interactive table in the report. 
 
 ```{r mdb, eval=FALSE}
 blastinr(btype = "blastn", dbase = "PATH/TO/DATABASE/FILES", 
@@ -68,7 +68,7 @@ qry = "PATH/TO/FASTA/FILE")
 
 A function to retrieve hit sequences from blast search results from within R.
 
-* `query_ids` is a vector which holds the ID of queries to be retrieved. 
+* `query_ids` is a vector which holds the ID of queries for which we want to retrieve their corresponding hit sequences. 
 * `blast_results` parameter is the dataframe output of the blastinr function. 
 * `NumHitseqs` Default is 1. The number of hits returned.
 * `outfile` indicates the name and path of the output file.
@@ -134,7 +134,7 @@ make_blast_db("spike_protein_seqs_SARS.fasta",'prot',NULL,'taxid_map_internalDS.
 [1] "Blast database successfully created."  "Outfile name: spike_protein_seqs_SARS"
 ```
 
-After make_blast_db function, there should be multiple files created either in the current directory or another directory specified to the funciton.
+After make_blast_db function, there should be multiple files created either in the current directory or another directory specified to the function.
 
 
 ### Obtain Sample Data
@@ -202,11 +202,11 @@ The output dataframe:
 # Retrieve ID vector
 qry_ids <- c("Bat_coronavirus")
 
-retrieve_hit_seqs(qry_ids, blast_func, "spike_protein_seqs_SARS", 6, "prot_hit_OneFile", TRUE, FALSE, FALSE)
+retrieve_hit_seqs(qry_ids, blast_output, "spike_protein_seqs_SARS", 6, "prot_hit_OneFile", TRUE, FALSE, FALSE)
 ```
 The first sequence inside the "prot_hit_OneFile" output fasta file.
 ```
->Bat_coronavirus__queryID:Bat_coronavirus_sstart:12_send:1269
+>Bat_coronavirus__queryID:Bat_coronavirus_sstart:12_send:1269_Orientation:+
 SSQCVNLTTRTQLPPAYTNSSTRGVYYPDKVFRSSVLHLTQDLFLPFFSNVTWFHAIHVSGTNGIKRFDNPVLPFNDGVYFASTEKSNIIRGWIFGTTLDSKTQSLLIVNNATNVVIKVCEFQFCNDPFLGVYYHKNNKSWMESEFRVYSSANNCTFEYVSQPFLMDLEGKQGNFKNLREFVFKNIDGYFKIYSKHTPINLVRDLPPGFSALEPLVDLPIGINITRFQTLLALHRSYLTPGDSSSGWTAGAAAYYVGYLQPRTFLLKYNENGTITDAVDCALDPLSETKCTLKSFTVEKGIYQTSNFRVQPTDSIVRFPNITNLCPFGEVFNATTFASVYAWNRKRISNCVADYSVLYNSTSFSTFKCYGVSPTKLNDLCFTNVYADSFVITGDEVRQIAPGQTGKIADYNYKLPDDFTGCVIAWNSKHIDAKEGGNFNYLYRLFRKANLKPFERDISTEIYQAGSKPCNGQTGLNCYYPLYRYGFYPTDGVGHQPYRVVVLSFELLNAPATVCGPKKSTNLVKNKCVNFNFNGLTGTGVLTESNKKFLPFQQFGRDIADTTDAVRDPQTLEILDITPCSFGGVSVITPGTNASNQVAVLYQDVNCTEVPVAIHADQLTPTWRVYSTGSNVFQTRAGCLIGAEHVNNSYECDIPIGAGICASYQTQTNSRSVASQSIIAYTMSLGAENSVAYSNNSIAIPTNFTISVTTEILPVSMTKTSVDCTMYICGDSTECSNLLLQYGSFCTQLNRALTGIAVEQDKNTQEVFAQVKQIYKTPPIKDFGGFNFSQILPDPSKPSKRSFIEDLLFNKVTLADAGFIKQYGDCLGDIAARDLICAQKFNGLTVLPPLLTDEMIAQYTSALLAGTITSGWTFGAGAALQIPFAMQMAYRFNGIGVTQNVLYENQKLIANQFNSAIGKIQDSLSSTASALGKLQDVVNQNAQALNTLVKQLSSNFGAISSVLNDILSRLDKVEAEVQIDRLITGRLQSLQTYVTQQLIRAAEIRASANLAATKMSECVLGQSKRVDFCGKGYHLMSFPQSAPHGVVFLHVTYVPAQEKNFTTAPAICHDGKAHFPREGVFVSNGTHWFVTQRNFYEPQIITTDNTFVSGSCDVVIGIVNNTVYDPLQPELDSFKEELDKYFKNHTSPDVDLGDISGINASVVNIQKEIDRLNEVAKNLNESLIDLQELGKYEQYIKWPWYIWLGFIAGLIAIIMVTIMLCCMTSCCSCLKGCCSCGSCCKFDEDDSEPVLKGVKLHYT
 
 ```
@@ -227,7 +227,7 @@ go_df2 <-  data.frame(
 Create a sankey plot summarizing the GO components that the input data is involved in. 
 
 ```r
-summarize_bl(df1, blst_search, id_col, summarize_cols, report = FALSE)
+summarize_bl(df1, blast_output, id_col, summarize_cols, report = FALSE)
 ```
 
 ![](Rplot.png)
