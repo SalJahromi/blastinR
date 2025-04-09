@@ -5,33 +5,42 @@ as dependencies
 
 
 
-* [Functions](#Functions)
+* [Function Descriptions](#Function Descriptions)
 
 * [Manual](#Manual)
 
 
-```{r libs, eval=FALSE}
-library("tidyverse")
-```
+**Essential libraries** for package functions.
 
 ```r
-# essential for the summarize_bl function
+library(tidyverse)
 library(networkD3)
 library(htmlwidgets)
 library(webshot)
+library(uuid)
+library(data.table)
+library(ggplot2)
+library(DT)
+library(knitr)
+library(rmarkdown)
+library(foreach)
+library(doParallel)
+library(dplyr)
+library(tidyr)
 
 ```
 
 
-# Functions
+# Function Descriptions
 
-There are a series of functions involved in the blastinR workflow.
+The following is a documentation of functions included in this package. In order to view examples their usage, please refer to the manual section, where a detailed example of the workflow is provided. Most functions have to be run in a specific order, as the output of one is the input of another. 
+
 
 ## **make_blast_db**
 
 The `make_blast_db` function is a wrapper for the `makeblastdb` function from BLAST+.
 It will generate all the files required for a BLAST database. 
-The `infile` argument should specify the path to a fasta file containing all the sequences 
+The `infile` argument should specify the path to a FASTA file containing all the sequences 
 to be included in the database. The `outfile` argument should specify the names of all the
 database files to be generated. All database files will carry the same name but will differ
 in extension. 
@@ -43,45 +52,45 @@ make_blast_db(infile = "PATH/TO/FILE.FASTA",outfile="my_out_file")
 ```
 
 
-
 ## **blstinr**
 
 Runs BLAST+ on query against a local database specified by the user. 
 
-* `btype` argument specifies which blast type would be used, the default is `blastn`.
-* `dbase` Path or name of the blast database without including any extensions.
-* `qry` Path or name of the query file. Must be fasta format.
-* `taxid` Default is FALSE. False means there is no file for taxonomy id. True means that there is a file for taxonomy id that was used in make_blast_db function.
-* `report` Default is TRUE. Creates report.
-* `ncores` Default is two. Number of threads.
-* `numt` arguments specifies the number of threads to be used, only work with UNIX based OS, default value is 1. 
+* `btype`  argument specifies which blast type would be used, the default is `blastn`.
+* `dbase`  path or name of the blast database without including any extensions.
+* `qry`  path or name of the query file. Must be FASTA format.
+* `taxid`  default is FALSE. FALSE means there is no file for taxonomy id. TRUE means that there is a file for taxonomy id that was used in make_blast_db function.
+* `report`  default is TRUE. Generates an interactive report.
+* `ncores`  default is two. Number of threads.
+* `numt`  argument specifies the number of threads to be used, only work with UNIX based OS, default value is 1. 
 
 Returns a dataframe with blast/query results. Will output this information in the form of an interactive table in the report. 
 
 ```{r mdb, eval=FALSE}
 blastinr(btype = "blastn", dbase = "PATH/TO/DATABASE/FILES", 
-qry = "PATH/TO/FASTA/FILE")
+qry = "PATH/TO/FASTA/FILE", taxid = FALSE, report = TRUE, ncores = 2, numt = 1)
 ```
 
 
-## **retrive_hit_seqs**
+## **retrieve_hit_seqs**
 
 A function to retrieve hit sequences from blast search results from within R.
 
-* `query_ids` is a vector which holds the ID of queries for which we want to retrieve their corresponding hit sequences. 
-* `blast_results` parameter is the dataframe output of the blastinr function. 
-* `NumHitseqs` Default is 1. The number of hits returned.
-* `outfile` indicates the name and path of the output file.
-* `cut_seq` Default is True. True will cut the hit sequence from start to end of match. False returns the entire sequence.
-* `MultFiles` Default is false. if True, will output one file of hit sequences for each query. False places all query hits in one file. 
-* `report` default parameter creates a report or adds to an existing report. 
+* `query_ids`  vector which holds the ID of queries for which we want to retrieve their corresponding hit sequences. 
+* `blast_results`  parameter is the dataframe output of the blastinr function. 
+* `NumHitseqs`  default is 1. The number of hits returned.
+* `outfile`  specifies the name and path of the output file.
+* `cut_seq`  default is TRUE. TRUE will cut the hit sequence from start to end of match. FALSE returns the entire sequence.
+* `MultFiles`  default is FALSE. if TRUE, will output one file of hit sequences for each query. FALSE places all query hits in one file. 
+* `report`  default is TRUE. Generates an interactive report.
+* `pipeline`  default parameter adds the function to the pipeline reporter. Set to FALSE by default and TRUE in Run_blast pipeline function.
 
-Outputs fasta files to outfile and returns hit sequences to terminal.
+Writes FASTA files to outfile path and returns hit sequences to the console.
 
 ```{r mdb, eval=FALSE}
 retrieve_hit_seqs(query_ids, blast_results, blastdb = "PATH/TO/FASTA/FILE", 
 NumHitseqs = 1, outfile= "PATH", cut_seq = TRUE,
-MultFiles = FALSE, report = TRUE)
+MultFiles = FALSE, report = TRUE, pipeline = FALSE)
 ```
 
 ## **summarize_bl**
@@ -92,17 +101,42 @@ Can plot taxonomy or GO annotations. Receives metadata to annotate blast outputs
 * `df2` dataframe outputted from blastinr function.
 * `id_col` The column name that contains the ID to merge dataframes with.
 * `summarize_cols` A vector that contains the names of the columns to summarize.
-* `report` default parameter is TRUE. Creates a report or adds to an existing report.
+* `report` default is TRUE. Generates an interactive report.
 
 Returns an interactive Sankey plot.
 
-## **Reporting System**
+```{r mdb, eval=FALSE}
+summarize_bl(df1, df2, id_col, summarize_cols, report = TRUE)
+```
 
-A great feature of this package is its ability to keep a record of the user's interactions with all of the functions within it. Furthermore, it will include the outputs that were generated by those functions.
+
+## **Generate_report**
+
+One of the key features of this package is its ability to record the user's interactions with all of the functions within it. Furthermore, it will include the outputs that were generated by those functions.
+
+Function will not require any inputs.
+
+```{r mdb, eval=FALSE}
+generate_report()
+```
+
+## **delete_report**
+
+To delete and clear the report.
+
+**Warning**: The report cannot be retrieved after deletion. To make a new report while keeping the old one, make a copy and change the name. Then, use this function to reset the record keeping.
+
+```{r mdb, eval = FALSE}
+delete_report()
+```
+
+------------------------------------------------------------------------------------------------
+<br>
 
 # Manual
 
 A basic workflow of the program is demonstrated below. For more information about the functions used and their parameters, refer to the function documentations above.
+
 
 ### Database Creation
 
@@ -114,20 +148,19 @@ In this example, spike proteins of different Coronavirus variants are used.
 # Obtain sequences from GitHub
 genomes_seqs <- readDNAStringSet(filepath = "https://raw.githubusercontent.com/idohatam/Biol-3315-files/main/SARS_MERS_coronavirus.raw_sequence.fasta")
 
-# Write sequences into a fasta file
+# Write sequences into a FASTA file
 writeXStringSet(genomes_seqs, file = "spike_protein_seqs_SARS.fasta", format = "fasta")
 
 ```
 
-After obtaining the fasta files that you wish to use as the database, use the make_blast_db function to create the database. 
+After obtaining the FASTA files that you wish to use as the database, use the make_blast_db function to create the database. 
 
 
 ```r
-# create a spike protein database from the fasta file. 
-make_blast_db("spike_protein_seqs_SARS.fasta",'prot',NULL,'taxid_map_internalDS.txt')
+# create a spike protein database from the FASTA file. 
+make_blast_db("spike_protein_seqs_SARS.fasta",'prot','taxid_map_internalDS.txt')
 
 ```
-
 
 ```
 --- 2024-10-26 17:54:00.140211 ---
@@ -148,28 +181,43 @@ The program is now ready to run a query against a database. The code below obtai
 genomes_seqs <- readDNAStringSet(
   filepath = "https://raw.githubusercontent.com/idohatam/Biol-3315-files/main/SARS_MERS_coronavirus.raw_sequence.fasta")
 
-# write sequences into a fasta file. 
+# write sequences into a FASTA file. 
 writeXStringSet(genomes_seqs, file = "genomes_seqs_SARS.fasta", format = "fasta")
 
 ```
 Note that the query sequences are nucleotides. This is important as it determines the type of blast that will be run against the database. 
 
 
+### Metadata 
+
+Create a dataframe containing Gene Ontology (GO) data for later annotation.
+
+```r
+go_df2 <-  data.frame(
+  ID = c(11, 22, 33, 44, 55, 66, 77, 88, 99, 14, 24, 34),
+  MolecularFunction = c("Nucleic acid binding", "Nucleic acid binding", "Catalytic activity", "Oxidoreductase activity", "DNA binding", "DNA binding", "RNA binding", "Signal transducer activity", "DNA binding", "Signal transducer activity", "ATP binding", "Protein kinase activity"),
+  BiologicalProcess = c("Transcription", "Biological process", "Metabolic process", "Biochemical synthesis", "Translation", "Transcription", "Phosphorylation", "Signal transduction", "Biochemical synthesis", "Signal transduction", "Transport", "Phosphorylation"),
+  CellularComponent = c("Nucleus", "Cytosol", "Cytoplasm", "Mitochondrion", "Ribosome", "Nucleus", "Nucleolus", "Cytoplasm", "Nucleus", "Plasma membrane", "Cytoplasm", "Plasma membrane")
+)
+```
+
 ### Run Pipeline
 
-To run all the functions of BLASTinR. 
+To run all the functions of BLASTinR with one command. If this is run, you have essentially completed all the steps that are shown after this command chunk. 
 
-```{r}
-Run_Blast(infile = "PATH/TO/DATABASE/FASTA/FILE", dbtype = "prot", taxids_file = "PATH/TO/TAX/ID/TXT/FILE", btype = "blastx",
-          qry = "PATH/TO/QUERY/FASTA/FILE",
-          taxid = TRUE, ncores = 3, query_ids = c("Camel_MERS-CoV","Bat_coronavirus","MERS_coronavirus"), retrievSeqs_outfile = "prot", df1 = df1, id_col = "ID", summarize_cols = c("", ""))
+```r
+Run_Blast(infile = "spike_protein_seqs_SARS.fasta", dbtype = "prot", taxids_file = "taxid_map_internalDS.txt", btype = "blastx",
+          qry = "genomes_seqs_SARS.fasta",
+          taxid = TRUE, ncores = 3, query_ids = c("Bat_coronavirus"), retrievSeqs_outfile = "prot_hit_OneFile", df1 = go_df2, id_col = "ID", summarize_cols = c("MolecularFunction", "BiologicalProcess","CellularComponent"))
 
 ```
+
+However, If you prefer to execute each step individually, you can skip this pipeline command and carry on with the rest of the commands listed below.
 
 
 ### BLAST Query Against Local Database
 
-Since the database is a protein database and the query is nucleotide sequences, we will use blastx.
+Since the database is a protein database and the query file has nucleotide sequences, we will use blastx.
 
 ```r
 blast_output <- blstinr('blastx','spike_protein_seqs_SARS','genomes_seqs_SARS.fasta', TRUE)
@@ -204,7 +252,9 @@ qry_ids <- c("Bat_coronavirus")
 
 retrieve_hit_seqs(qry_ids, blast_output, "spike_protein_seqs_SARS", 6, "prot_hit_OneFile", TRUE, FALSE, FALSE)
 ```
-The first sequence inside the "prot_hit_OneFile" output fasta file.
+
+The first sequence inside the "prot_hit_OneFile.fasta" output file.
+
 ```
 >Bat_coronavirus__queryID:Bat_coronavirus_sstart:12_send:1269_Orientation:+
 SSQCVNLTTRTQLPPAYTNSSTRGVYYPDKVFRSSVLHLTQDLFLPFFSNVTWFHAIHVSGTNGIKRFDNPVLPFNDGVYFASTEKSNIIRGWIFGTTLDSKTQSLLIVNNATNVVIKVCEFQFCNDPFLGVYYHKNNKSWMESEFRVYSSANNCTFEYVSQPFLMDLEGKQGNFKNLREFVFKNIDGYFKIYSKHTPINLVRDLPPGFSALEPLVDLPIGINITRFQTLLALHRSYLTPGDSSSGWTAGAAAYYVGYLQPRTFLLKYNENGTITDAVDCALDPLSETKCTLKSFTVEKGIYQTSNFRVQPTDSIVRFPNITNLCPFGEVFNATTFASVYAWNRKRISNCVADYSVLYNSTSFSTFKCYGVSPTKLNDLCFTNVYADSFVITGDEVRQIAPGQTGKIADYNYKLPDDFTGCVIAWNSKHIDAKEGGNFNYLYRLFRKANLKPFERDISTEIYQAGSKPCNGQTGLNCYYPLYRYGFYPTDGVGHQPYRVVVLSFELLNAPATVCGPKKSTNLVKNKCVNFNFNGLTGTGVLTESNKKFLPFQQFGRDIADTTDAVRDPQTLEILDITPCSFGGVSVITPGTNASNQVAVLYQDVNCTEVPVAIHADQLTPTWRVYSTGSNVFQTRAGCLIGAEHVNNSYECDIPIGAGICASYQTQTNSRSVASQSIIAYTMSLGAENSVAYSNNSIAIPTNFTISVTTEILPVSMTKTSVDCTMYICGDSTECSNLLLQYGSFCTQLNRALTGIAVEQDKNTQEVFAQVKQIYKTPPIKDFGGFNFSQILPDPSKPSKRSFIEDLLFNKVTLADAGFIKQYGDCLGDIAARDLICAQKFNGLTVLPPLLTDEMIAQYTSALLAGTITSGWTFGAGAALQIPFAMQMAYRFNGIGVTQNVLYENQKLIANQFNSAIGKIQDSLSSTASALGKLQDVVNQNAQALNTLVKQLSSNFGAISSVLNDILSRLDKVEAEVQIDRLITGRLQSLQTYVTQQLIRAAEIRASANLAATKMSECVLGQSKRVDFCGKGYHLMSFPQSAPHGVVFLHVTYVPAQEKNFTTAPAICHDGKAHFPREGVFVSNGTHWFVTQRNFYEPQIITTDNTFVSGSCDVVIGIVNNTVYDPLQPELDSFKEELDKYFKNHTSPDVDLGDISGINASVVNIQKEIDRLNEVAKNLNESLIDLQELGKYEQYIKWPWYIWLGFIAGLIAIIMVTIMLCCMTSCCSCLKGCCSCGSCCKFDEDDSEPVLKGVKLHYT
@@ -213,24 +263,14 @@ SSQCVNLTTRTQLPPAYTNSSTRGVYYPDKVFRSSVLHLTQDLFLPFFSNVTWFHAIHVSGTNGIKRFDNPVLPFNDGVY
 
 ### Summarize 
 
-Creating a dataframe holding GO terms for the summary plot.
-
-```r
-go_df2 <-  data.frame(
-  ID = c(11, 22, 33, 44, 55, 66, 77, 88, 99, 14, 24, 34),
-  MolecularFunction = c("Nucleic acid binding", "Nucleic acid binding", "Catalytic activity", "Oxidoreductase activity", "DNA binding", "DNA binding", "RNA binding", "Signal transducer activity", "DNA binding", "Signal transducer activity", "ATP binding", "Protein kinase activity"),
-  BiologicalProcess = c("Transcription", "Biological process", "Metabolic process", "Biochemical synthesis", "Translation", "Transcription", "Phosphorylation", "Signal transduction", "Biochemical synthesis", "Signal transduction", "Transport", "Phosphorylation"),
-  CellularComponent = c("Nucleus", "Cytosol", "Cytoplasm", "Mitochondrion", "Ribosome", "Nucleus", "Nucleolus", "Cytoplasm", "Nucleus", "Plasma membrane", "Cytoplasm", "Plasma membrane")
-)
-```
 
 Create a sankey plot summarizing the GO components that the input data is involved in. 
 
 ```r
-summarize_bl(df1, blast_output, id_col, summarize_cols, report = FALSE)
+summarize_bl(go_df2, blast_output, id_col = "ID", summarize_cols = c("MolecularFunction", "BiologicalProcess","CellularComponent"), report = FALSE)
 ```
 
-![](Rplot.png)
+![](Rplot01.png)
 
 
 ### Generate Report
@@ -238,7 +278,7 @@ summarize_bl(df1, blast_output, id_col, summarize_cols, report = FALSE)
 
 Finally, we generate a report in an html file, detailing the user's use of functions, their inputs, and outputs. 
 
-To generate an html file, run the code below.
+To generate an html file, run the code below. The file will appear in your current directory.
 
 ```r
 generate_report()
