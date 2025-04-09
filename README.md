@@ -5,7 +5,7 @@ as dependencies
 
 
 
-* [Function Descriptions](#Function Descriptions)
+* [Functions](#Functions)
 
 * [Manual](#Manual)
 
@@ -31,7 +31,7 @@ library(tidyr)
 ```
 
 
-# Function Descriptions
+# Functions
 
 The following is a documentation of functions included in this package. In order to view examples their usage, please refer to the manual section, where a detailed example of the workflow is provided. Most functions have to be run in a specific order, as the output of one is the input of another. 
 
